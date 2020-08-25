@@ -1,0 +1,12 @@
+# Maven
+target/
+out/
+logs/
+
+# Folder config file
+Desktop.ini
+
+# IntelliJ
+.idea
+*.iml
+
