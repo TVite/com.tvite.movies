@@ -1,2 +1,140 @@
-Hello World!<br>
-TMDb API key: ${tmdb.api.key}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Library</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            height: 60px;
+            padding-left: 20px;
+            padding-right: 20px;
+            box-sizing: border-box;
+            background-color: #023e8a;
+            box-shadow: 0px 0px 10px #000;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            line-height: 60px;
+        }
+
+        header > input {
+            display: inline-block;
+            height: 25px;
+            box-sizing: border-box;
+        }
+
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-title {
+            margin-top: 50px;
+            margin-bottom: 20px;
+            width: 1225px;
+            color: #222;
+            font-size: 32px;
+        }
+
+        .movie-list {
+            width: 1225px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .movie {
+            margin: 20px;
+            width: 200px;
+            height: 300px;
+            background-size: cover;
+            border: 2.5px solid #222;
+            border-radius: 4px;
+        }
+
+        .movie-description {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background-color: #000;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .movie-description:hover {
+            opacity: 1;
+            background-color: rgba(2, 62, 138, 0.85);
+        }
+
+        .fav.material-icons {
+            font-size: 30px;
+        }
+
+        .fav.material-icons:hover {
+            color: rgb(255,223,0);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    Movie Library
+
+    <form>
+        <input class="search-bar" type="text" placeholder="Enter a movie name..." >
+        <input class="search-button" type="button" value="Search" onclick="searchMovies()">
+    </form>
+</header>
+<main>
+    <div class="search-title"></div>
+    <section class="movie-list"></section>
+</main>
+</body>
+</html>
+<script>
+    const searchQuery = "${search.query}";
+    const searchResults = ${search.results};
+    console.log(searchResults);
+
+    document.querySelector(".search-title").innerHTML="Search results for: " + searchQuery;
+
+    for (let result in searchResults) {
+        addMovie(searchResults[result]);
+    }
+
+    function addMovie(data) {
+        let ele = document.createElement("div");
+        ele.classList.add("movie");
+        ele.style.backgroundImage = "url(https://image.tmdb.org/t/p/w500" + data["poster_path"] + ")";
+
+        let desc = document.createElement("div");
+        desc.classList.add("movie-description");
+        desc.innerHTML = data["title"] + "<br>" + "<a class='fav material-icons'>star_outline</a>";
+        ele.append(desc);
+
+        document.querySelector(".movie-list").append(ele);
+    }
+
+    function searchMovies() {
+        let query = document.querySelector(".search-bar").value.split(' ').join('+');
+        window.location.replace(${application.url} + "/search?query=" + query);
+    }
+</script>
