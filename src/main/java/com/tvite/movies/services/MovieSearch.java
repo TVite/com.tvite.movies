@@ -13,14 +13,22 @@ import java.util.List;
 @Service
 public class MovieSearch {
 
+    @Value("${tmdb.movie.search.url}")
+    private String searchUrl;
+
     @Value("${tmdb.api.key}")
     private String apiKey;
 
+    /**
+     * Search for movies based on title.
+     * @param query Search query.
+     * @return List of JSON Objects that represent data on a movie.
+     */
     public List<JSONObject> search(String query) {
         List<JSONObject> results = new ArrayList<>();
 
         RestTemplate restTemplate = new RestTemplate();
-        String queryResponse = restTemplate.getForObject("https://api.themoviedb.org/3/search/movie?api_key=" + apiKey + "&query=" +query, String.class);
+        String queryResponse = restTemplate.getForObject(searchUrl + "?api_key=" + apiKey + "&query=" + query, String.class);
 
         try {
             JSONObject responseJson = new JSONObject(queryResponse);
@@ -34,5 +42,4 @@ public class MovieSearch {
 
         return results;
     }
-
 }

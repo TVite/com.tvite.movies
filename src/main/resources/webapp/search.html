@@ -116,10 +116,33 @@
 </body>
 </html>
 <script>
+    const searchQuery = "${search.query}";
+    const searchResults = ${search.results};
+    console.log(searchResults);
+
+    document.querySelector(".search-title").innerHTML="Search results for: " + searchQuery;
+
+    for (let result in searchResults) {
+        addMovie(searchResults[result]);
+    }
+
     document.querySelector("#search-form").addEventListener("submit", event => {
         event.preventDefault();
         searchMovies();
     });
+
+    function addMovie(data) {
+        let ele = document.createElement("div");
+        ele.classList.add("movie");
+        ele.style.backgroundImage = "url(https://image.tmdb.org/t/p/w500" + data["poster_path"] + ")";
+
+        let desc = document.createElement("div");
+        desc.classList.add("movie-description");
+        desc.innerHTML = data["title"] + "<br>" + "<a class='fav material-icons'>star_outline</a>";
+        ele.append(desc);
+
+        document.querySelector(".movie-list").append(ele);
+    }
 
     function searchMovies() {
         let query = document.querySelector(".search-bar").value.split(' ').join('+');

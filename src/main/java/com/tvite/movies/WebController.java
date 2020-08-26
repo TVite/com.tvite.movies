@@ -20,20 +20,17 @@ public class WebController {
     @Value("${application.url}")
     private String appUrl;
 
-    @Value("${tmdb.api.key}")
-    private String apiKey;
-
     @GetMapping("/")
     public String index() {
-        return getWebPage("index.html");
+        return getWebPageString("index.html");
     }
 
     @GetMapping("/search")
     public String search(@RequestParam(name = "query") String query) {
-        String webPage = getWebPage("index.html");
-        return webPage
-                .replace("${search.results}", searchService.search(query).toString())
-                .replace("${search.query}", query);
+        return transformSearchPage(
+                getWebPageString("search.html"),
+                query
+        );
     }
 
     /**
@@ -41,24 +38,35 @@ public class WebController {
      * @param filename Path and the name of the file in resources/webapp.
      * @return Content of files as a string
      */
-    private String getWebPage(String filename) {
+    private String getWebPageString(String filename) {
         String fileContent;
         try {
             fileContent = Resources.toString(Resources.getResource("webapp/" + filename), StandardCharsets.UTF_8);
         } catch (IllegalArgumentException | IOException e) {
             fileContent = "Could not find " + filename;
         }
-        return replacePlaceholders(fileContent);
+        return transformAllPages(fileContent);
     }
 
     /**
-     * Helper method to replace placeholders with approporiate values.
-     * @param string String with placeholders
-     * @return String with values
+     * Helper method to replace placeholders for all pages.
+     * @param page Web page string
+     * @return Transformed web page string
      */
-    private String replacePlaceholders(String string) {
-        return string
-                .replace("${tmdb.api.key}", apiKey)
+    private String transformAllPages(String page) {
+        return page
                 .replace("${application.url}", appUrl);
+    }
+
+    /**
+     * Helper methods to replace placeholders for search results page.
+     * @param page Web page string
+     * @param query Search query
+     * @return Transformed web page string
+     */
+    private String transformSearchPage(String page, String query) {
+        return page
+                .replace("${search.results}", searchService.search(query).toString())
+                .replace("${search.query}", query);
     }
 }
