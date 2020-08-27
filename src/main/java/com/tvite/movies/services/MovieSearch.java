@@ -3,6 +3,7 @@ package com.tvite.movies.services;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,9 @@ public class MovieSearch {
     @Value("${tmdb.api.key}")
     private String apiKey;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     /**
      * Search for movies based on title.
      * @param query Search query.
@@ -27,8 +31,8 @@ public class MovieSearch {
     public List<JSONObject> search(String query) {
         List<JSONObject> results = new ArrayList<>();
 
-        RestTemplate restTemplate = new RestTemplate();
-        String queryResponse = restTemplate.getForObject(searchUrl + "?api_key=" + apiKey + "&query=" + query, String.class);
+        String queryUrl = searchUrl + "?api_key=" + apiKey + "&query=" + query;
+        String queryResponse = restTemplate.getForObject(queryUrl, String.class);
 
         try {
             JSONObject responseJson = new JSONObject(queryResponse);

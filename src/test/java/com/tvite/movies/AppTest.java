@@ -1,5 +1,7 @@
 package com.tvite.movies;
 
+import org.apache.log4j.Logger;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +21,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 
 @SpringBootTest(classes = {MovieApplication.class, RestTemplate.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AppTest {
+
+    private Logger log = Logger.getLogger(AppTest.class.getName());
 
     @LocalServerPort
     private int webPort;
