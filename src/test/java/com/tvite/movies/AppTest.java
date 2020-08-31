@@ -60,7 +60,7 @@ public class AppTest {
 
     @Test
     public void testSearch() {
-        apiServer.stubFor(get(urlPathEqualTo("/search"))
+        apiServer.stubFor(get(urlPathEqualTo("/api/search"))
                 .withQueryParam("api_key", equalTo(apiKey))
                 .withQueryParam("query", equalTo("Jack"))
                 .willReturn(aResponse()
@@ -76,20 +76,55 @@ public class AppTest {
     }
 
     @Test
-    public void testSearchInvalidFormat() {
-        apiServer.stubFor(get(urlPathEqualTo("/search"))
+    public void testUserFavorites() {
+        String userName = "NewUserTest";
+        String favMovieId = "98765";
+        String favMovieTitle = "Test Favorite Movie";
+        String favMovieData = "{\"id\":" + favMovieId + ",\"title\":\"" + favMovieTitle + "\",\"poster_path\":\"poster.jpg\"}";
+
+        apiServer.stubFor(get(urlPathEqualTo("/api/movie/" + favMovieId))
+                .withQueryParam("api_key", equalTo(apiKey))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "text/json")
+                        .withStatus(200)
+                        .withBody(favMovieData))
+        );
+
+        restTemplate.getForEntity("http://localhost:" + webPort + "/user/create?user=" + userName, String.class);
+        restTemplate.getForEntity("http://localhost:" + webPort + "/user/favorite?user=" + userName + "&movie_id=" + favMovieId, String.class);
+        String response = restTemplate.getForEntity("http://localhost:" + webPort + "/?user=" + userName, String.class).getBody();
+
+        Assertions.assertTrue(response.contains("allUsers = [\"Admin\", \"NewUserTest\"]"));
+        Assertions.assertTrue(response.contains("favoritesList = [{\"id\":98765,\"title\":\"Test Favorite Movie\",\"poster_path\":\"poster.jpg\"}]"));
+    }
+
+    @Test
+    public void testInvalidFormatResponse() {
+        apiServer.stubFor(get(urlPathEqualTo("/api/search"))
                 .withQueryParam("api_key", equalTo(apiKey))
                 .withQueryParam("query", equalTo("Tom"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "text/json")
                         .withStatus(200)
-                        .withBody("json expected but got wrong format"))
+                        .withBody("invalid format"))
         );
 
         String response = restTemplate.getForEntity("http://localhost:" + webPort + "/search?query=Tom", String.class).getBody();
 
         // Check if api returns invalid json, results are set to an empty array
-        Assertions.assertTrue(response.contains("const searchResults = [];"));
-    }
+        Assertions.assertTrue(response.contains("searchResults = [];"));
 
+        apiServer.stubFor(get(urlPathEqualTo("/api/movie/123"))
+                .withQueryParam("api_key", equalTo(apiKey))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "text/json")
+                        .withStatus(200)
+                        .withBody("not json"))
+        );
+
+        restTemplate.getForEntity("http://localhost:" + webPort + "/user/favorite?user=Admin&movie_id=123", String.class);
+        String response2 = restTemplate.getForEntity("http://localhost:" + webPort + "/?user=Admin", String.class).getBody();
+
+        Assertions.assertTrue(response2.contains("favoritesList = [null]"));
+    }
 }
