@@ -55,6 +55,10 @@
             font-size: 32px;
         }
 
+        #user-list {
+            margin-right: 50px;
+        }
+
         .movie-list {
             width: 1225px;
             display: flex;
@@ -105,6 +109,8 @@
     <a onclick="goToHomePage()">Movie Library</a>
 
     <form id="search-form">
+        <input class="new-user-button" type="button" value="+" onclick="newUser()">
+        <select id="user-list" onchange="changeUser()"></select>
         <input class="search-bar" type="text" placeholder="Enter a movie name..." >
         <input class="search-button" type="button" value="Search" onclick="searchMovies()">
     </form>
@@ -116,40 +122,24 @@
 </body>
 </html>
 <script>
-    const searchQuery = "${search.query}";
+    ${common.javascript}
+    const pageId = "search";
+
     const searchResults = ${search.results};
-    console.log(searchResults);
-
-    document.querySelector(".search-title").innerHTML="Search results for: " + searchQuery;
-
     for (let result in searchResults) {
         addMovie(searchResults[result]);
     }
 
-    document.querySelector("#search-form").addEventListener("submit", event => {
-        event.preventDefault();
-        searchMovies();
-    });
+    document.querySelector(".search-title").innerHTML="Search results for: ${search.query}";
 
-    function addMovie(data) {
-        let ele = document.createElement("div");
-        ele.classList.add("movie");
-        ele.style.backgroundImage = "url(https://image.tmdb.org/t/p/w500" + data["poster_path"] + ")";
+    function addToFavorites(id) {
+        let Http = new XMLHttpRequest();
+        let url = ${application.url} + "/user/favorite?movie_id=" + id + "&user=" + user;
+        Http.open("GET", url);
+        Http.send();
 
-        let desc = document.createElement("div");
-        desc.classList.add("movie-description");
-        desc.innerHTML = data["title"] + "<br>" + "<a class='fav material-icons'>star_outline</a>";
-        ele.append(desc);
-
-        document.querySelector(".movie-list").append(ele);
-    }
-
-    function searchMovies() {
-        let query = document.querySelector(".search-bar").value.split(' ').join('+');
-        window.location.replace(${application.url} + "/search?query=" + query);
-    }
-
-    function goToHomePage() {
-        window.location.replace(${application.url});
+        Http.onreadystatechange = (e) => {
+            goToHomePage();
+        }
     }
 </script>

@@ -47,7 +47,11 @@
             align-items: center;
         }
 
-        .search-title {
+        #user-list {
+            margin-right: 50px;
+        }
+
+        .favorites-title {
             margin-top: 50px;
             margin-bottom: 20px;
             width: 1225px;
@@ -105,28 +109,26 @@
     <a onclick="goToHomePage()">Movie Library</a>
 
     <form id="search-form">
+        <input class="new-user-button" type="button" value="+" onclick="newUser()">
+        <select id="user-list" onchange="changeUser()"></select>
         <input class="search-bar" type="text" placeholder="Enter a movie name..." >
         <input class="search-button" type="button" value="Search" onclick="searchMovies()">
     </form>
 </header>
 <main>
-    <div class="search-title"></div>
+    <div class="favorites-title"></div>
     <section class="movie-list"></section>
 </main>
 </body>
 </html>
 <script>
-    document.querySelector("#search-form").addEventListener("submit", event => {
-        event.preventDefault();
-        searchMovies();
-    });
+    ${common.javascript}
+    const pageId = "index";
 
-    function searchMovies() {
-        let query = document.querySelector(".search-bar").value.split(' ').join('+');
-        window.location.replace(${application.url} + "/search?query=" + query);
+    const favoritesList = ${favorites.list};
+    for (let favorite in favoritesList) {
+        addMovie(favoritesList[favorite]);
     }
 
-    function goToHomePage() {
-        window.location.replace(${application.url});
-    }
+    document.querySelector(".favorites-title").innerHTML = user + "'s favorites";
 </script>
